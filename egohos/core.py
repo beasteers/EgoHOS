@@ -237,7 +237,7 @@ def merge_segs(segs):
 
 #from IPython import embed
 @torch.no_grad()
-def run(src, out_file=True, **kw):
+def run(src, size=480, out_file=True, **kw):
     """Run multi-target tracker on a particular sequence.
     """
     import tqdm
@@ -255,9 +255,11 @@ def run(src, out_file=True, **kw):
     box_annotator = sv.BoxAnnotator()
     mask_annotator = sv.MaskAnnotator()
 
-    video_info = sv.VideoInfo.from_video_path(src)
+    # video_info = sv.VideoInfo.from_video_path(src)
+    video_info, WH = get_video_info(src, size=size)
     with sv.VideoSink(out_file, video_info=video_info) as s:
         for i, im in tqdm.tqdm(enumerate(sv.get_video_frames_generator(src)), total=video_info.total_frames):
+            im = cv2.resize(im, WH)
             masks, class_ids = model(im)
             boxes = masks_to_boxes(torch.as_tensor(masks))
             detections = sv.Detections(
@@ -279,6 +281,30 @@ def run(src, out_file=True, **kw):
                 ]
             )
             s.write_frame(im)
+
+
+def get_video_info(src, size=None, fps_down=1, nrows=1, ncols=1):
+    import supervision as sv
+    # get the source video info
+    video_info = sv.VideoInfo.from_video_path(video_path=src)
+    # make the video size a multiple of 16 (because otherwise it won't generate masks of the right size)
+    aspect = video_info.width / video_info.height
+    size = size or video_info.height
+    video_info.width = int(aspect*size)//16*16
+    video_info.height = int(size)//16*16
+    WH = video_info.width, video_info.height
+
+    # double width because we have both detic and xmem frames
+    video_info.width *= ncols
+    video_info.height *= nrows
+    # possibly reduce the video frame rate
+    video_info.og_fps = video_info.fps
+    video_info.fps /= fps_down or 1
+
+    print(f"Input Video {src}\nsize: {WH}  fps: {video_info.fps}")
+    return video_info, WH
+
+
 
 if __name__ == '__main__':
     import fire
