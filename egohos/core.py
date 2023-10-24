@@ -15,7 +15,7 @@ from PIL import Image, ImageOps
 from mmseg.apis import init_segmentor
 from mmcv.parallel import collate, scatter
 from mmseg.datasets.pipelines import Compose
-# from .checkpoint import ensure_checkpoint
+from .checkpoint import ensure_checkpoint
 from torchvision.ops import masks_to_boxes
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -52,10 +52,11 @@ class BaseEgoHos(nn.Module):
 
     def __init__(self, config=None, checkpoint=None, device=device):
         super().__init__()
+        model_dir = ensure_checkpoint(MODEL_DIR)
         assert config is not None, "You must provide a config"
         if not os.path.isfile(config):
             self.name = config
-            config = os.path.join(MODEL_DIR, config, f'{config}.py')
+            config = os.path.join(model_dir, config, f'{config}.py')
             assert os.path.isfile(config), f'{self.name} not in {os.listdir(MODEL_DIR)}'
         else:
             self.name = os.path.basename(os.path.dirname(config))

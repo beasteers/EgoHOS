@@ -8,6 +8,7 @@ FILE_ID = '1LNMQ6TGf1QaCjMgTExPzl7lFFs-yZyqX'
 
 def ensure_checkpoint(path=None):
     path = path or os.path.join(MODEL_DIR, 'egohos')
+    #print(path, os.path.isdir(path))
     if not os.path.isdir(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
 
