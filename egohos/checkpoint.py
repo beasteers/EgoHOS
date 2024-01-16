@@ -4,7 +4,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 MODEL_DIR = os.getenv("MODEL_DIR") or os.path.join(ROOT_DIR, 'weights')
 
 BASE_URL = 'https://docs.google.com/uc?export=download&confirm=t&id={}'
-FILE_ID = '1LNMQ6TGf1QaCjMgTExPzl7lFFs-yZyqX'
+FILE_ID = '1m7C_rWymUi045CpWkaXza8zWJ-Emys1X' #'1LNMQ6TGf1QaCjMgTExPzl7lFFs-yZyqX'
 
 def ensure_checkpoint(path=None):
     path = path or os.path.join(MODEL_DIR, 'egohos')
