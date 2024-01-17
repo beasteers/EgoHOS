@@ -23,7 +23,7 @@ def ensure_checkpoint(path=None):
             urllib.request.urlretrieve(url, out_path, show_progress)
             try:
                 with zipfile.ZipFile(out_path, 'r') as zf:
-                    zf.extractall(pathi)
+                    zf.extractall(path)
             except zipfile.BadZipFile:
                 print(url)
                 print(open(out_path).read(200))
